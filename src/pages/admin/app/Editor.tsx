@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { postService } from '../../../services/postService';
+import { postService, sanitizeHtml } from '../../../services/postService';
 import { authService } from '../../../services/authService';
 import { slugify } from '../../../utils/slugify';
 import Cropper from 'react-easy-crop';
@@ -63,7 +63,7 @@ export default function Editor() {
         setStatus(post.status);
         setCoverImage(post.cover_image);
         setImagePosition(post.image_position);
-        if (editorRef.current) editorRef.current.innerHTML = post.content || '';
+        if (editorRef.current) editorRef.current.innerHTML = sanitizeHtml(post.content || '');
       });
     }
   }, [editSlug]);
@@ -164,11 +164,17 @@ export default function Editor() {
 
   const handleInlineImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Image must be under 2 MB.');
+        e.target.value = '';
+        return;
+      }
       const reader = new FileReader();
       reader.onload = () => {
         insertImageAtCursor(reader.result?.toString() || '');
       };
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(file);
       e.target.value = '';
     }
   };
@@ -180,6 +186,12 @@ export default function Editor() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Cover image must be under 2 MB.');
+        e.target.value = '';
+        return;
+      }
       const reader = new FileReader();
       reader.addEventListener('load', () => {
         setUploadedImage(reader.result?.toString() || '');

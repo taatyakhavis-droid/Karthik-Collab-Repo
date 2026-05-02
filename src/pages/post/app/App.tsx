@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { postService } from '../../../services/postService';
+import { postService, sanitizeHtml, safeSrc } from '../../../services/postService';
 import { Post } from '../../../types/post';
 
-export default function App() {
+export default function PostReader() {
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -17,6 +18,16 @@ export default function App() {
         window.scrollTo(0, 0);
       });
   }, [slug]);
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback: do nothing
+    }
+  };
 
   if (loading) {
     return (
@@ -40,34 +51,53 @@ export default function App() {
     );
   }
 
+  // Sanitize content on render — protects against stored XSS
+  const safeContent = sanitizeHtml(post.content);
+  const safeImage = safeSrc(post.cover_image);
+
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white overflow-x-hidden">
-      {/* ── Minimal public header — zero admin references ── */}
+      {/* Header — zero admin references */}
       <header className="fixed top-0 flex justify-between items-center w-full px-6 py-4 bg-[#0e0e0e]/80 backdrop-blur-xl z-50 shadow-[0px_20px_40px_rgba(0,0,0,0.4)]">
         <Link to="/">
           <h1 className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06]" style={{ fontSize: '24px' }}>
             THE ARCHIVE
           </h1>
         </Link>
-        <Link
-          to="/"
-          className="text-gray-400 font-bold hover:text-[#FBDE06] transition-colors flex items-center gap-2 text-xs uppercase tracking-widest"
-        >
-          <span className="material-symbols-outlined font-bold" style={{ fontSize: '18px' }}>arrow_back</span>
-          Back
-        </Link>
+        <div className="flex items-center gap-4">
+          {/* Share / copy link */}
+          <button
+            onClick={handleShare}
+            title="Copy link"
+            className="text-gray-400 hover:text-[#FBDE06] transition-colors flex items-center gap-2 text-xs uppercase tracking-widest"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+              {copied ? 'check' : 'link'}
+            </span>
+            {copied ? 'Copied!' : 'Share'}
+          </button>
+          <Link
+            to="/"
+            className="text-gray-400 font-bold hover:text-[#FBDE06] transition-colors flex items-center gap-2 text-xs uppercase tracking-widest"
+          >
+            <span className="material-symbols-outlined font-bold" style={{ fontSize: '18px' }}>arrow_back</span>
+            Back
+          </Link>
+        </div>
       </header>
 
       <main className="pt-24 pb-20 max-w-5xl mx-auto px-6">
-        {/* Cover image — always full color, no grayscale */}
-        <div className="mb-12 rounded-[2.5rem] overflow-hidden neumorphic-flat shadow-2xl">
-          <img
-            src={post.cover_image}
-            className="w-full aspect-[21/9] object-cover"
-            style={{ objectPosition: post.image_position || 'center' }}
-            alt={post.title}
-          />
-        </div>
+        {/* Cover image — always full color, validated src */}
+        {safeImage && (
+          <div className="mb-12 rounded-[2.5rem] overflow-hidden neumorphic-flat shadow-2xl">
+            <img
+              src={safeImage}
+              className="w-full aspect-[21/9] object-cover"
+              style={{ objectPosition: post.image_position || 'center' }}
+              alt={post.title}
+            />
+          </div>
+        )}
 
         <div className="flex flex-col gap-6">
           {/* Meta row */}
@@ -110,11 +140,25 @@ export default function App() {
             </p>
           )}
 
-          {/* Body */}
+          {/* Body — sanitized with DOMPurify before render */}
           <div
             className="editor-content text-[#adaaaa] leading-relaxed text-lg mt-4"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: safeContent }}
           />
+
+          {/* Bottom share bar */}
+          <div className="mt-8 pt-8 border-t border-[#1a1a1a] flex items-center justify-between">
+            <Link to="/" className="text-[#FBDE06] font-bold uppercase tracking-widest text-xs flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">arrow_back</span> Back to Archive
+            </Link>
+            <button
+              onClick={handleShare}
+              className="text-gray-500 hover:text-[#FBDE06] transition-colors flex items-center gap-2 text-xs uppercase tracking-widest"
+            >
+              <span className="material-symbols-outlined text-sm">{copied ? 'check_circle' : 'share'}</span>
+              {copied ? 'Link Copied' : 'Share this post'}
+            </button>
+          </div>
         </div>
       </main>
     </div>

@@ -23,7 +23,9 @@ export default function App() {
         throw new Error('Access denied. This portal is restricted to the administrator.');
       }
     } catch (err: any) {
-      setError(err.message || 'Access Denied: Invalid Credentials');
+      // Normalise all errors to a single message — prevents auth info leakage
+      setError('Access denied. Invalid credentials.');
+      console.error('Login error:', err.message);
     } finally {
       setLoading(false);
     }

@@ -9,7 +9,8 @@ import Login from "./pages/login/app/App";
 import { supabase } from "./lib/supabase";
 import "./index.css";
 
-const ADMIN_EMAIL = "admin@mostlyindia.in";
+const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL as string) || '';
+if (!ADMIN_EMAIL) console.warn('⚠️  VITE_ADMIN_EMAIL not set in .env.local');
 
 /**
  * Renders identical 404 for both unknown pages AND unauthenticated admin access.

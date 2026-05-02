@@ -9,7 +9,8 @@ export const authService = {
   isAdmin: async (): Promise<boolean> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return false;
-    return user.email === 'admin@mostlyindia.in';
+    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL as string;
+    return !!(adminEmail && user.email === adminEmail);
   },
 
   signInWithEmail: async (email: string, password: string) => {
