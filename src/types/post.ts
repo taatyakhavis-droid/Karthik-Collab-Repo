@@ -1,18 +1,17 @@
-export interface Author {
-  name: string;
-  avatar: string;
-}
-
 export interface Post {
   id: string;
   title: string;
-  category: string;
+  slug: string;
+  short_description: string;
   content: string;
-  image: string;
-  date: string;
+  cover_image: string;
+  image_position: string;
+  category: string;
   status: 'draft' | 'public';
-  author: Author;
-  readTime: string;
-  imagePosition?: string;
-  tags?: string[];
+  read_time: string;
+  tags: string[];
+  author_name: string;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
 }
