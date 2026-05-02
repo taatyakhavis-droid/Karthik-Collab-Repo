@@ -37,6 +37,11 @@ export default function Editor() {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
 
+  // Inline image insertion state
+  const [showImagePanel, setShowImagePanel] = useState(false);
+  const [inlineImageUrl, setInlineImageUrl] = useState('');
+  const savedSelection = useRef<Range | null>(null);
+
   useEffect(() => {
     Promise.all([postService.getCategories(), postService.getTags()])
       .then(([cats, tags]) => {
@@ -46,7 +51,7 @@ export default function Editor() {
       });
 
     if (editSlug) {
-      postService.getPostBySlug(editSlug).then(post => {
+      postService.getAdminPostBySlug(editSlug).then(post => {
         if (!post) { navigate('/admin'); return; }
         setPostId(post.id);
         setTitle(post.title);
@@ -87,7 +92,7 @@ export default function Editor() {
     setSaveError('');
     try {
       const content = editorRef.current?.innerHTML || '';
-      const saved = await postService.savePost({
+      await postService.savePost({
         id: postId || undefined,
         title,
         slug,
@@ -101,10 +106,8 @@ export default function Editor() {
         author_name: 'Admin',
         published_at: null,
       });
-      setSaveStatus('success');
-      setTimeout(() => setSaveStatus('idle'), 3000);
-      if (!isEditing) navigate(`/admin/edit/${saved.slug}`, { replace: true });
-      else if (saved.slug !== editSlug) navigate(`/admin/edit/${saved.slug}`, { replace: true });
+      // Always redirect to dashboard after save
+      navigate('/admin');
     } catch (e: any) {
       setSaveStatus('error');
       setSaveError(e.message || 'Save failed. The slug may already be taken.');
@@ -120,6 +123,54 @@ export default function Editor() {
 
   const formatText = (command: string, value?: string) => {
     document.execCommand(command, false, value);
+  };
+
+  // ── Cursor-position helpers for inline image insertion ──
+  const saveSelection = () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      savedSelection.current = sel.getRangeAt(0).cloneRange();
+    }
+  };
+
+  const restoreSelection = () => {
+    editorRef.current?.focus();
+    const sel = window.getSelection();
+    if (savedSelection.current && sel) {
+      sel.removeAllRanges();
+      sel.addRange(savedSelection.current);
+    }
+  };
+
+  const insertImageAtCursor = (src: string) => {
+    restoreSelection();
+    document.execCommand(
+      'insertHTML', false,
+      `<img src="${src}" alt="Inline image" style="max-width:100%;border-radius:12px;margin:1.5rem auto;display:block;" />`
+    );
+    setShowImagePanel(false);
+    setInlineImageUrl('');
+  };
+
+  const handleShowImagePanel = () => {
+    saveSelection();
+    setShowImagePanel(prev => !prev);
+  };
+
+  const handleInsertImageUrl = () => {
+    if (!inlineImageUrl.trim()) return;
+    insertImageAtCursor(inlineImageUrl.trim());
+  };
+
+  const handleInlineImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        insertImageAtCursor(reader.result?.toString() || '');
+      };
+      reader.readAsDataURL(e.target.files[0]);
+      e.target.value = '';
+    }
   };
 
   const handleLink = () => {
@@ -156,7 +207,7 @@ export default function Editor() {
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          <Link to="/" className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] hidden md:block" style={{ fontSize: '20px' }}>THE ARCHIVE</Link>
+          <Link to="/admin" className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] hidden md:block" style={{ fontSize: '20px' }}>THE ARCHIVE</Link>
           <Link to="/admin/categories" className="text-gray-400 hover:text-[#FBDE06] text-xs uppercase tracking-widest hidden md:block">Categories & Tags</Link>
         </div>
       </header>
@@ -245,13 +296,56 @@ export default function Editor() {
                     <button onClick={handleLink} className="p-2 neumorphic-flat rounded-lg hover:text-[#FBDE06] transition-colors">
                       <span className="material-symbols-outlined">link</span>
                     </button>
+                    <button
+                      onClick={handleShowImagePanel}
+                      className={`p-2 neumorphic-flat rounded-lg transition-colors ${showImagePanel ? 'text-[#FBDE06] bg-[#0a0a0a]' : 'hover:text-[#FBDE06]'}`}
+                      title="Insert image"
+                    >
+                      <span className="material-symbols-outlined">image</span>
+                    </button>
                     <button onClick={() => document.documentElement.requestFullscreen()} className="p-2 neumorphic-flat rounded-lg hover:text-[#FBDE06] transition-colors ml-auto">
                       <span className="material-symbols-outlined">fullscreen</span>
                     </button>
                   </div>
+
+                  {/* Inline Image Panel */}
+                  {showImagePanel && (
+                    <div className="p-4 bg-[#1a1a1a] border-b border-[#0a0a0a] space-y-3 animate-in slide-in-from-top duration-200">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#FBDE06]">Insert Image into Content</p>
+                      <div className="flex gap-2">
+                        <input
+                          className="flex-1 bg-[#131313] rounded-lg px-3 py-2 border border-[#262626] focus:border-[#FBDE06]/40 text-white placeholder:text-gray-600 text-sm outline-none transition-colors"
+                          placeholder="Paste image URL here..."
+                          value={inlineImageUrl}
+                          onChange={e => setInlineImageUrl(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && handleInsertImageUrl()}
+                          autoFocus
+                        />
+                        <button
+                          onClick={handleInsertImageUrl}
+                          disabled={!inlineImageUrl.trim()}
+                          className="px-5 py-2 bg-[#FBDE06] text-[#0e0e0e] rounded-lg font-black uppercase text-xs disabled:opacity-40 hover:scale-105 active:scale-95 transition-transform"
+                        >
+                          Insert
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 h-px bg-[#262626]" />
+                        <span className="text-gray-600 text-xs uppercase tracking-widest">or upload</span>
+                        <div className="flex-1 h-px bg-[#262626]" />
+                      </div>
+                      <label className="flex items-center justify-center gap-2 p-3 rounded-lg neumorphic-flat cursor-pointer text-gray-400 hover:text-[#FBDE06] transition-colors text-xs uppercase tracking-widest font-bold">
+                        <span className="material-symbols-outlined text-sm">upload_file</span>
+                        Upload from device
+                        <input type="file" accept="image/*" className="hidden" onChange={handleInlineImageUpload} />
+                      </label>
+                    </div>
+                  )}
+
                   <div
                     ref={editorRef}
                     contentEditable
+                    suppressContentEditableWarning
                     className="w-full min-h-[300px] bg-transparent border-0 focus:ring-0 px-8 py-6 text-white leading-relaxed outline-none"
                     style={{ fontSize: '18px' }}
                   />

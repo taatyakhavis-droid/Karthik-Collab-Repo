@@ -3,27 +3,53 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* ── Typography ── */
   --font-size: 16px;
-  --background: #0e0e0e;
-  --foreground: #ffffff;
-  --card: #20201f;
-  --card-foreground: #ffffff;
-  --popover: #20201f;
-  --popover-foreground: #ffffff;
-  --primary: #FBDE06;
-  --primary-foreground: #0e0e0e;
-  --secondary: #626200;
+
+  /* ── Core Palette ── */
+  --bg-base:        #0e0e0e;   /* Page background */
+  --bg-surface:     #20201f;   /* Cards, panels */
+  --bg-raised:      #1a1a1a;   /* Hover states, sidebar */
+  --bg-inset:       #131313;   /* Input backgrounds */
+  --bg-overlay:     #262626;   /* Borders, dividers */
+
+  /* ── Accent ── */
+  --accent:         #FBDE06;   /* Yellow — primary brand */
+  --accent-fg:      #0e0e0e;   /* Text on yellow backgrounds */
+  --accent-subtle:  rgba(251,222,6,0.15);
+
+  /* ── Text ── */
+  --text-primary:   #ffffff;
+  --text-secondary: #adaaaa;
+  --text-muted:     #666666;
+  --text-ghost:     #2a2a2a;   /* Watermark text */
+
+  /* ── Semantic ── */
+  --destructive:    #ff7351;
+  --success:        #4ade80;
+  --warning:        #f59e0b;
+
+  /* ── Neumorphic Shadows ── */
+  --shadow-dark:    #0a0a0a;
+  --shadow-light:   #1a1a1a;
+
+  /* ── Tailwind compat aliases ── */
+  --background:     var(--bg-base);
+  --foreground:     var(--text-primary);
+  --card:           var(--bg-surface);
+  --card-foreground:var(--text-primary);
+  --popover:        var(--bg-surface);
+  --popover-foreground: var(--text-primary);
+  --primary:        var(--accent);
+  --primary-foreground: var(--accent-fg);
+  --secondary:      #626200;
   --secondary-foreground: #ffffff;
-  --muted: #262626;
-  --muted-foreground: #adaaaa;
-  --accent: #FBDE06;
-  --accent-foreground: #0e0e0e;
-  --destructive: #ff7351;
-  --destructive-foreground: #ffffff;
-  --border: #484847;
-  --radius: 0.625rem;
-  --sidebar: #1a1a1a;
-  --sidebar-foreground: #ffffff;
+  --muted:          var(--bg-overlay);
+  --muted-foreground: var(--text-secondary);
+  --border:         #484847;
+  --radius:         0.625rem;
+  --sidebar:        var(--bg-raised);
+  --sidebar-foreground: var(--text-primary);
 }
 
 @theme {
@@ -97,5 +123,31 @@
     color: #ffffff !important;
     text-shadow: 0 0 10px rgba(251, 222, 6, 0.4) !important;
     text-decoration-color: #ffffff !important;
+  }
+
+  /* Hide scrollbar but keep scrolling */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Prose base for blog reader */
+  .editor-content p { margin-bottom: 1.5rem; }
+  .editor-content h1, .editor-content h2, .editor-content h3 {
+    font-family: var(--font-archivo);
+    color: var(--text-primary);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+  }
+  .editor-content ul, .editor-content ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .editor-content li { margin-bottom: 0.5rem; }
+  .editor-content blockquote {
+    border-left: 4px solid var(--accent);
+    padding-left: 1.5rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--text-secondary);
   }
 }

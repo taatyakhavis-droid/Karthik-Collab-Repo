@@ -25,6 +25,18 @@ export const postService = {
       .from('posts')
       .select('*')
       .eq('slug', slug)
+      .eq('status', 'public')
+      .single();
+    if (error) return null;
+    return data as Post;
+  },
+
+  // Admin fetch — returns drafts too (protected by RLS: auth required)
+  getAdminPostBySlug: async (slug: string): Promise<Post | null> => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('slug', slug)
       .single();
     if (error) return null;
     return data as Post;
