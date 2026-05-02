@@ -87,7 +87,7 @@ export default function Editor() {
     setSaveError('');
     try {
       const content = editorRef.current?.innerHTML || '';
-      const saved = await postService.savePost({
+      await postService.savePost({
         id: postId || undefined,
         title,
         slug,
@@ -101,10 +101,8 @@ export default function Editor() {
         author_name: 'Admin',
         published_at: null,
       });
-      setSaveStatus('success');
-      setTimeout(() => setSaveStatus('idle'), 3000);
-      if (!isEditing) navigate(`/admin/edit/${saved.slug}`, { replace: true });
-      else if (saved.slug !== editSlug) navigate(`/admin/edit/${saved.slug}`, { replace: true });
+      // Always redirect to dashboard after save
+      navigate('/admin');
     } catch (e: any) {
       setSaveStatus('error');
       setSaveError(e.message || 'Save failed. The slug may already be taken.');
