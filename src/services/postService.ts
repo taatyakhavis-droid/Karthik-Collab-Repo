@@ -1,134 +1,126 @@
+import { supabase } from '../lib/supabase';
 import { Post } from '../types/post';
 
-const STORAGE_KEY = 'mostly_india_posts';
-const CATEGORY_KEY = 'mostly_india_categories';
-
-const DEFAULT_CATEGORIES = [
-  'Digital Theory',
-  'Brutalist Architecture',
-  'Kinetic Motion',
-  'Art & Culture'
-];
-
-// Initial seed data to make the app look alive immediately
-const SEED_DATA: Post[] = [
-  {
-    id: '1',
-    title: 'THE FUTURE OF ANALOG SYSTEMS',
-    category: 'Technology',
-    content: '<p>Exploring why tactile interfaces are making a massive comeback in a hyper-digital world. Neumorphism, often criticized as an aesthetic gimmick, represents a deeper psychological need for tactile reassurance.</p>',
-    image: 'https://images.unsplash.com/photo-1770515853604-4487b6370bc1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    date: 'OCT 24, 2025',
-    status: 'public',
-    author: { name: 'Erik Vildsten', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=100' },
-    readTime: '8 min read',
-    tags: ['Brutalism', 'Design Systems', 'Tactile UI']
-  },
-  {
-    id: '2',
-    title: 'DECODING NEUMORPHIC DEPTH',
-    category: 'Design',
-    content: 'How light and shadow create the illusion of physicality on flat screens.',
-    image: 'https://images.unsplash.com/photo-1648049941490-b22f4d35fb45?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    date: 'OCT 21, 2025',
-    status: 'public',
-    author: { name: 'Sarah Chen', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=100' },
-    readTime: '5 min read',
-    tags: ['UI/UX', 'Shadows', 'Depth']
-  }
-];
+function calculateReadTime(content: string): string {
+  const text = content.replace(/<[^>]*>/g, '');
+  const words = text.split(/\s+/).filter(w => w.length > 0).length;
+  const minutes = Math.max(1, Math.ceil(words / 200));
+  return `${minutes} min read`;
+}
 
 export const postService = {
-  // --- Category Methods ---
-  getCategories: (): string[] => {
-    try {
-      const stored = localStorage.getItem(CATEGORY_KEY);
-      if (!stored) {
-        localStorage.setItem(CATEGORY_KEY, JSON.stringify(DEFAULT_CATEGORIES));
-        return DEFAULT_CATEGORIES;
-      }
-      const parsed = JSON.parse(stored);
-      return Array.isArray(parsed) ? parsed : DEFAULT_CATEGORIES;
-    } catch (e) {
-      console.error('Failed to parse categories:', e);
-      return DEFAULT_CATEGORIES;
-    }
+  // ─── PUBLIC ────────────────────────────────────────────────
+  getPosts: async (): Promise<Post[]> => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('status', 'public')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []) as Post[];
   },
 
-  addCategory: (name: string): string[] => {
-    const categories = postService.getCategories();
-    if (name && !categories.includes(name)) {
-      categories.push(name);
-      localStorage.setItem(CATEGORY_KEY, JSON.stringify(categories));
-    }
-    return categories;
+  getPostBySlug: async (slug: string): Promise<Post | null> => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('slug', slug)
+      .single();
+    if (error) return null;
+    return data as Post;
   },
 
-  deleteCategory: (name: string): string[] => {
-    const categories = postService.getCategories().filter(c => c !== name);
-    localStorage.setItem(CATEGORY_KEY, JSON.stringify(categories));
-    return categories;
+  // ─── ADMIN ─────────────────────────────────────────────────
+  getAllPosts: async (): Promise<Post[]> => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []) as Post[];
   },
 
-  getPosts: (): Post[] => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_DATA));
-        return SEED_DATA;
-      }
-      const parsed = JSON.parse(stored);
-      return Array.isArray(parsed) ? parsed : SEED_DATA;
-    } catch (e) {
-      console.error('Failed to parse posts:', e);
-      return SEED_DATA;
-    }
-  },
-
-  getPostById: (id: string): Post | undefined => {
-    const posts = postService.getPosts();
-    return posts.find(p => p.id === id);
-  },
-
-  savePost: (post: Partial<Post>): Post => {
-    const posts = postService.getPosts();
-    const newPost: Post = {
-      id: post.id || Math.random().toString(36).substr(2, 9),
-      title: post.title || 'Untitled Post',
-      category: post.category || 'Uncategorized',
+  savePost: async (post: Partial<Post> & { slug: string; title: string }): Promise<Post> => {
+    const now = new Date().toISOString();
+    const readTime = calculateReadTime(post.content || '');
+    const toSave = {
+      title: post.title,
+      slug: post.slug,
+      short_description: post.short_description || '',
       content: post.content || '',
-      image: post.image || 'https://images.unsplash.com/photo-1518005020951-eccb494ad742',
-      imagePosition: post.imagePosition || '50% 50%',
-      date: post.date || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase(),
+      cover_image: post.cover_image || '',
+      image_position: post.image_position || '50% 50%',
+      category: post.category || 'Uncategorized',
       status: post.status || 'draft',
-      author: post.author || { name: 'Admin', avatar: '' },
-      readTime: post.readTime || '3 min read',
-      tags: post.tags || []
+      read_time: readTime,
+      tags: post.tags || [],
+      author_name: post.author_name || 'Admin',
+      updated_at: now,
+      published_at: post.status === 'public' ? (post.published_at || now) : null,
     };
 
-    const existingIndex = posts.findIndex(p => p.id === newPost.id);
-    if (existingIndex > -1) {
-      posts[existingIndex] = newPost;
+    if (post.id) {
+      const { data, error } = await supabase
+        .from('posts')
+        .update(toSave)
+        .eq('id', post.id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Post;
     } else {
-      posts.unshift(newPost);
+      const { data, error } = await supabase
+        .from('posts')
+        .insert({ ...toSave, created_at: now })
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Post;
     }
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-    return newPost;
   },
 
-  deletePost: (id: string): void => {
-    const posts = postService.getPosts();
-    const filtered = posts.filter(p => p.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  deletePost: async (id: string): Promise<void> => {
+    const { error } = await supabase.from('posts').delete().eq('id', id);
+    if (error) throw error;
   },
 
-  updatePostStatus: (id: string, status: 'public' | 'draft' | 'archived'): void => {
-    const posts = postService.getPosts();
-    const index = posts.findIndex(p => p.id === id);
-    if (index > -1) {
-      posts[index].status = status;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-    }
-  }
+  // ─── CATEGORIES ────────────────────────────────────────────
+  getCategories: async (): Promise<string[]> => {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('name')
+      .order('name');
+    if (error) throw error;
+    return (data || []).map((c: { name: string }) => c.name);
+  },
+
+  addCategory: async (name: string): Promise<void> => {
+    const { error } = await supabase.from('categories').insert({ name });
+    if (error) throw error;
+  },
+
+  deleteCategory: async (name: string): Promise<void> => {
+    const { error } = await supabase.from('categories').delete().eq('name', name);
+    if (error) throw error;
+  },
+
+  // ─── TAGS ──────────────────────────────────────────────────
+  getTags: async (): Promise<string[]> => {
+    const { data, error } = await supabase
+      .from('tags')
+      .select('name')
+      .order('name');
+    if (error) throw error;
+    return (data || []).map((t: { name: string }) => t.name);
+  },
+
+  addTag: async (name: string): Promise<void> => {
+    const { error } = await supabase.from('tags').insert({ name });
+    if (error) throw error;
+  },
+
+  deleteTag: async (name: string): Promise<void> => {
+    const { error } = await supabase.from('tags').delete().eq('name', name);
+    if (error) throw error;
+  },
 };
