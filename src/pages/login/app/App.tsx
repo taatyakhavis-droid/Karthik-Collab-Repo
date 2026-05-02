@@ -17,7 +17,7 @@ export default function App() {
       await authService.signInWithEmail(email, password);
       const isConfirmed = await authService.isAdmin();
       if (isConfirmed) {
-        navigate('/admin');
+        navigate('/console');
       } else {
         await authService.logout();
         throw new Error('Access denied. This portal is restricted to the administrator.');
@@ -44,7 +44,7 @@ export default function App() {
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-[#FBDE06] uppercase tracking-[0.3em] ml-1">Admin Email</label>
             <input
-              type="email" required placeholder="admin@mostlyindia.in"
+              type="email" required placeholder="your email"
               className="w-full bg-[#131313] neumorphic-inset rounded-xl px-5 py-4 border-0 text-white outline-none focus:ring-1 focus:ring-[#FBDE06]/20 transition-all placeholder:text-gray-800"
               value={email} onChange={(e) => { setEmail(e.target.value); setError(''); }}
             />

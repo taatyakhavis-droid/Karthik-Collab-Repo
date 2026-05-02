@@ -52,7 +52,7 @@ export default function Editor() {
 
     if (editSlug) {
       postService.getAdminPostBySlug(editSlug).then(post => {
-        if (!post) { navigate('/admin'); return; }
+        if (!post) { navigate('/console'); return; }
         setPostId(post.id);
         setTitle(post.title);
         setSlug(post.slug);
@@ -107,7 +107,7 @@ export default function Editor() {
         published_at: null,
       });
       // Always redirect to dashboard after save
-      navigate('/admin');
+      navigate('/console');
     } catch (e: any) {
       setSaveStatus('error');
       setSaveError(e.message || 'Save failed. The slug may already be taken.');
@@ -118,7 +118,7 @@ export default function Editor() {
     if (!postId) return;
     if (!window.confirm(`Permanently delete "${title}"?`)) return;
     await postService.deletePost(postId);
-    navigate('/admin');
+    navigate('/console');
   };
 
   const formatText = (command: string, value?: string) => {
@@ -202,13 +202,13 @@ export default function Editor() {
       {/* Header */}
       <header className="fixed top-0 flex justify-between items-center w-full px-6 py-4 bg-[#0e0e0e]/80 backdrop-blur-xl z-50 shadow-[0px_20px_40px_rgba(0,0,0,0.4)]">
         <div className="flex items-center gap-4">
-          <Link to="/admin" className="text-gray-400 hover:text-[#FBDE06] transition-colors flex items-center gap-2 text-xs uppercase tracking-widest">
+          <Link to="/console" className="text-gray-400 hover:text-[#FBDE06] transition-colors flex items-center gap-2 text-xs uppercase tracking-widest">
             <span className="material-symbols-outlined text-sm">arrow_back</span> Dashboard
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          <Link to="/admin" className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] hidden md:block" style={{ fontSize: '20px' }}>THE ARCHIVE</Link>
-          <Link to="/admin/categories" className="text-gray-400 hover:text-[#FBDE06] text-xs uppercase tracking-widest hidden md:block">Categories & Tags</Link>
+          <Link to="/console" className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] hidden md:block" style={{ fontSize: '20px' }}>THE ARCHIVE</Link>
+          <Link to="/console/categories" className="text-gray-400 hover:text-[#FBDE06] text-xs uppercase tracking-widest hidden md:block">Categories & Tags</Link>
         </div>
       </header>
 
@@ -421,7 +421,7 @@ export default function Editor() {
                   </button>
                 ))}
                 {!availableTags.length && (
-                  <Link to="/admin/categories" className="text-[#adaaaa] text-xs">Add tags in Categories & Tags →</Link>
+                  <Link to="/console/categories" className="text-[#adaaaa] text-xs">Add tags in Categories & Tags →</Link>
                 )}
               </div>
             </section>

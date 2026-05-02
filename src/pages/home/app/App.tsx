@@ -26,8 +26,10 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
       postService.getPosts(),
       postService.getCategories(),
@@ -37,7 +39,7 @@ export default function App() {
       setCategories(c);
       setTags(t);
     }).catch(console.error).finally(() => setLoading(false));
-  }, []);
+  }, [refreshKey]);;
 
   const filteredPosts = posts.filter(p => {
     if (selectedCategory) return p.category === selectedCategory;
@@ -65,6 +67,12 @@ export default function App() {
     setSelectedTag(null);
   };
 
+  const handleLogoClick = () => {
+    clearFilter();
+    setRefreshKey(k => k + 1);
+    setIsMenuOpen(false);
+  };
+
   const activeFilter = selectedCategory || selectedTag;
 
   return (
@@ -83,7 +91,7 @@ export default function App() {
             <div className="w-6 h-0.5 bg-[#FBDE06] group-hover:w-8 transition-all" />
             <div className="w-4 h-0.5 bg-[#FBDE06] group-hover:w-8 transition-all" />
           </button>
-          <Link to="/" onClick={clearFilter}>
+          <Link to="/" onClick={handleLogoClick}>
             <h1 className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06]" style={{ fontSize: '24px' }}>
               THE ARCHIVE
             </h1>

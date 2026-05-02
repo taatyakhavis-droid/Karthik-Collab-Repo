@@ -143,12 +143,12 @@ export default function Categories() {
       {/* ── Header ── */}
       <header className="fixed top-0 flex justify-between items-center w-full px-6 py-4 bg-[#0e0e0e]/80 backdrop-blur-xl z-50 shadow-[0px_20px_40px_rgba(0,0,0,0.4)]">
         <Link
-          to="/admin"
+          to="/console"
           className="text-gray-400 hover:text-[#FBDE06] transition-colors flex items-center gap-2 text-xs uppercase tracking-widest"
         >
           <span className="material-symbols-outlined text-sm">arrow_back</span> Dashboard
         </Link>
-        <Link to="/admin" className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] hidden md:block" style={{ fontSize: '20px' }}>
+        <Link to="/console" className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] hidden md:block" style={{ fontSize: '20px' }}>
           THE ARCHIVE
         </Link>
         <button

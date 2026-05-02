@@ -77,7 +77,6 @@ src/
 
 ### `/login` — Admin Authentication
 - Email + password login form connected to **Supabase Auth**
-- Restricted to a single admin email (`admin@mostlyindia.in`)
 - Neumorphic dark-styled form with animated error states
 - Redirects to `/admin` on successful auth elevation
 
@@ -107,8 +106,6 @@ src/
 ## Authentication
 
 Auth is handled by **Supabase Auth**:
-
-- `authService.isAdmin()` checks if the logged-in user's email matches `admin@mostlyindia.in`
 - Supports **email/password** login and **Google OAuth**
 - The Supabase client has a graceful no-config fallback so the app won't crash if keys are missing
 - `ProtectedRoute` in the root router blocks access to `/admin` for unauthenticated users
