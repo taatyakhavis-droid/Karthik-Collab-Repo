@@ -39,7 +39,7 @@ export default function Dashboard() {
       {/* Header */}
       <header className="fixed top-0 flex justify-between items-center w-full px-6 py-4 bg-[#0e0e0e]/80 backdrop-blur-xl z-50 shadow-[0px_20px_40px_rgba(0,0,0,0.4)]">
         <div className="flex items-center gap-4">
-          <Link to="/"><h1 className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06]" style={{ fontSize: '24px' }}>THE ARCHIVE</h1></Link>
+          <Link to="/admin"><h1 className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06]" style={{ fontSize: '24px' }}>THE ARCHIVE</h1></Link>
         </div>
         <div className="flex items-center gap-6">
           <nav className="hidden md:flex gap-6 items-center">

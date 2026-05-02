@@ -148,7 +148,7 @@ export default function Categories() {
         >
           <span className="material-symbols-outlined text-sm">arrow_back</span> Dashboard
         </Link>
-        <Link to="/" className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] hidden md:block" style={{ fontSize: '20px' }}>
+        <Link to="/admin" className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] hidden md:block" style={{ fontSize: '20px' }}>
           THE ARCHIVE
         </Link>
         <button
