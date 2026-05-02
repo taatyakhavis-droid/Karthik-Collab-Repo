@@ -464,7 +464,7 @@ export default function Editor() {
               {isEditing && (
                 <div className="flex gap-3">
                   <Link
-                    to={`/blog/${slug}`} target="_blank"
+                    to={`/blog/${slug}`} target="_blank" rel="noopener noreferrer"
                     className="flex-1 py-3 rounded-xl font-bold uppercase tracking-widest text-xs neumorphic-flat text-gray-400 hover:text-[#FBDE06] transition-colors flex items-center justify-center gap-1"
                   >
                     <span className="material-symbols-outlined text-sm">open_in_new</span> Preview
