@@ -219,7 +219,7 @@ export default function Editor() {
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          <Link to="/console" className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] hidden md:block" style={{ fontSize: '20px' }}>THE ARCHIVE</Link>
+          <Link to="/console" className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] hidden md:block" style={{ fontSize: '20px' }}>mostlyindia.in</Link>
           <Link to="/console/categories" className="text-gray-400 hover:text-[#FBDE06] text-xs uppercase tracking-widest hidden md:block">Categories & Tags</Link>
         </div>
       </header>

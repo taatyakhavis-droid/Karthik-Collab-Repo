@@ -38,7 +38,7 @@ export default function App() {
           <div className="w-16 h-16 bg-[#0e0e0e] neumorphic-inset rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="material-symbols-outlined text-[#FBDE06]" style={{ fontSize: '32px' }}>key</span>
           </div>
-          <h1 className="font-archivo text-[#FBDE06] uppercase text-2xl tracking-tighter">THE ARCHIVE</h1>
+          <h1 className="font-archivo text-[#FBDE06] uppercase text-2xl tracking-tighter">mostlyindia.in</h1>
           <p className="text-[#adaaaa] uppercase tracking-[0.2em] mt-2" style={{ fontSize: '10px' }}>Secure Administration Portal</p>
         </div>
 

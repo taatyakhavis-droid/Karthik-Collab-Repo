@@ -149,7 +149,7 @@ export default function Categories() {
           <span className="material-symbols-outlined text-sm">arrow_back</span> Dashboard
         </Link>
         <Link to="/console" className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] hidden md:block" style={{ fontSize: '20px' }}>
-          THE ARCHIVE
+          mostlyindia.in
         </Link>
         <button
           onClick={() => authService.logout()}

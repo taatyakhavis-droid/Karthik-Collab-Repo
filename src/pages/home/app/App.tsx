@@ -93,7 +93,7 @@ export default function HomePage() {
           </button>
           <Link to="/" onClick={handleLogoClick}>
             <h1 className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06]" style={{ fontSize: '24px' }}>
-              THE ARCHIVE
+              mostlyindia.in
             </h1>
           </Link>
         </div>
@@ -227,7 +227,7 @@ export default function HomePage() {
                       to={`/blog/${featuredPost.slug}`}
                       className="bg-[#20201f] text-[#FBDE06] px-8 py-4 rounded-xl neumorphic-flat active:shadow-[inset_4px_4px_8px_#0a0a0a,inset_-4px_-4px_8px_#1a1a1a] transition-all font-bold uppercase tracking-widest inline-flex items-center gap-2 text-xs"
                     >
-                      Read Archive <span className="material-symbols-outlined">arrow_forward</span>
+                      Read mostlyindia.in <span className="material-symbols-outlined">arrow_forward</span>
                     </Link>
                   </div>
                 </div>

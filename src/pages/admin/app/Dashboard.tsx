@@ -42,7 +42,7 @@ export default function Dashboard() {
       <header className="fixed top-0 flex justify-between items-center w-full px-4 sm:px-6 py-4 bg-[#0e0e0e]/80 backdrop-blur-xl z-50 shadow-[0px_20px_40px_rgba(0,0,0,0.4)]">
         <div className="flex items-center gap-4">
           <Link to="/console" onClick={() => setRefreshKey(k => k + 1)}>
-            <h1 className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] text-xl sm:text-2xl">THE ARCHIVE</h1>
+            <h1 className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06] text-xl sm:text-2xl">mostlyindia.in</h1>
           </Link>
         </div>
         <div className="flex items-center gap-4 sm:gap-6">

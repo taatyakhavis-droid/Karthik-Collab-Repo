@@ -41,8 +41,8 @@ export default function PostReader() {
     return (
       <div className="min-h-screen bg-[#0e0e0e] text-white flex flex-col items-center justify-center gap-6">
         <h1 className="font-archivo text-6xl text-gray-800 uppercase">404</h1>
-        <p className="text-[#adaaaa] uppercase tracking-widest text-sm">
-          This record does not exist in the archive
+        <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">
+          This record does not exist in mostlyindia.in
         </p>
         <Link to="/" className="text-[#FBDE06] font-bold uppercase tracking-widest text-xs flex items-center gap-2">
           <span className="material-symbols-outlined text-sm">arrow_back</span> Return Home
@@ -61,7 +61,7 @@ export default function PostReader() {
       <header className="fixed top-0 flex justify-between items-center w-full px-6 py-4 bg-[#0e0e0e]/80 backdrop-blur-xl z-50 shadow-[0px_20px_40px_rgba(0,0,0,0.4)]">
         <Link to="/">
           <h1 className="font-archivo tracking-[-0.02em] uppercase text-[#FBDE06]" style={{ fontSize: '24px' }}>
-            THE ARCHIVE
+            mostlyindia.in
           </h1>
         </Link>
         <div className="flex items-center gap-4">
@@ -149,7 +149,7 @@ export default function PostReader() {
           {/* Bottom share bar */}
           <div className="mt-8 pt-8 border-t border-[#1a1a1a] flex items-center justify-between">
             <Link to="/" className="text-[#FBDE06] font-bold uppercase tracking-widest text-xs flex items-center gap-2">
-              <span className="material-symbols-outlined text-sm">arrow_back</span> Back to Archive
+              <span className="material-symbols-outlined text-sm">arrow_back</span> Back to mostlyindia.in
             </Link>
             <button
               onClick={handleShare}
